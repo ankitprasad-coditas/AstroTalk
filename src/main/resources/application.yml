@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: Astrotalk
+  datasource:
+    password: 12345
+    url: jdbc:postgresql://localhost:5432/astrotalk
+    username: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
