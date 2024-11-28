@@ -14,5 +14,5 @@ public interface ClientRepo extends JpaRepository<Client, Long> {
     Optional<Client> findByNameAndDobAndPlaceOfBirthAndTimeOfBirth(String name, LocalDate dob, String placeOfBirth, String timeOfBirth);
 
     @Query("SELECT SUM(c.amountPaid) FROM Consultation c WHERE MONTH(c.consultationDate) = :month AND YEAR(c.consultationDate) = :year")
-    Double findTotalEarningsByMonth(@Param("month") int month, @Param("year") int year);
+    Double findTotalEarningsByMonth(@Param("month") long month, @Param("year") long year);
 }

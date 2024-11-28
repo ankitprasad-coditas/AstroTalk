@@ -1,5 +1,6 @@
 package com.assignment.Astrotalk.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -29,8 +30,8 @@ public class Consultation {
 
     private Double balanceAmount  = 0d;
 
-//    @JsonManagedReferences
-    @ManyToOne
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clients_id")
     private Client client;
 

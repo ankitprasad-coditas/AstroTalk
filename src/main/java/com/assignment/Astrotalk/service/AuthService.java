@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Service
@@ -54,9 +55,8 @@ public class AuthService {
                     .build();
             homeScreenDto.setJwtResponseDto(jwtResponseDto);
             homeScreenDto.setClientDtoList(clientService.allClients());
-            homeScreenDto.setConsultationDtoList(consultationService.getAllConsultation());
 
-            Double monthlyEarning = clientRepo.findTotalEarningsByMonth(new Date().getMonth(),new Date().getYear());
+            Double monthlyEarning = clientRepo.findTotalEarningsByMonth(LocalDate.now().getMonth().getValue(),LocalDate.now().getYear());
             homeScreenDto.setMonthlyEarning(monthlyEarning);
 
             ApiResponseDto<HomeScreenDto> response = new ApiResponseDto<>(homeScreenDto, HttpStatus.CREATED.value(), "Logged In Successfully");

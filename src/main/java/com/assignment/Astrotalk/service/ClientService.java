@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,7 @@ public class ClientService {
         return clientRepo.findAll().stream()
                 .map(client -> {
                     ClientDto clientDto = objectMapper.convertValue(client, ClientDto.class);
+                    clientDto.setChart(Base64.getEncoder().encode(client.getChart()));
                     return clientDto;
                 })
                 .collect(Collectors.toList());
@@ -57,9 +59,4 @@ public class ClientService {
         clientRepo.deleteById(id);
     }
 
-    // Pagination
-    /*public Page<Product> getProducts(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return productRepository.findAll(pageable);
-    }*/
 }

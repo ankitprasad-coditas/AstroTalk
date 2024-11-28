@@ -3,7 +3,6 @@ package com.assignment.Astrotalk.controller;
 import com.assignment.Astrotalk.dto.ApiResponseDto;
 import com.assignment.Astrotalk.dto.ConsultationDto;
 import com.assignment.Astrotalk.entity.Consultation;
-import com.assignment.Astrotalk.exception.NotAllowedException;
 import com.assignment.Astrotalk.service.ConsultationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.List;
 
 @RestController
@@ -27,11 +27,18 @@ public class ConsultationController {
         this.objectMapper = objectMapper;
     }
 
-    @GetMapping("/allConsultations")
-    public ResponseEntity<ApiResponseDto<List<ConsultationDto>>> getAllConsults() {
-        List<ConsultationDto> allConsultation = consultationService.getAllConsultation();
+    @GetMapping("/allConsultations/pageNo")
+    public ResponseEntity<ApiResponseDto<List<ConsultationDto>>> getAllConsults(@RequestParam("pageNo") int pageNo) {
+
+        List<ConsultationDto> allConsultation = consultationService.getAllConsultation(pageNo);
         ApiResponseDto<List<ConsultationDto>> response = new ApiResponseDto<>(allConsultation, HttpStatus.OK.value(), "All Consultations");
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @GetMapping("/getUpcomingConsultations")
+    public ResponseEntity<List<Consultation>> getUpcomingConsultation(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate){
+        return new ResponseEntity<>(consultationService.getUpcomingConsultations(Date.valueOf(startDate).toLocalDate(),Date.valueOf(endDate).toLocalDate()),HttpStatus.OK);
+
     }
 
     @PostMapping("/newConsultation")

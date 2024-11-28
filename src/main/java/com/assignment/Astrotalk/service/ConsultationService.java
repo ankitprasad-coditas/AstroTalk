@@ -7,9 +7,15 @@ import com.assignment.Astrotalk.exception.ClientNotFoundException;
 import com.assignment.Astrotalk.repository.ClientRepo;
 import com.assignment.Astrotalk.repository.ConsultationRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,8 +35,10 @@ public class ConsultationService {
         this.objectMapper = objectMapper;
     }
 
-    public List<ConsultationDto> getAllConsultation() {
-        return consultationRepo.findAll().stream()
+    public List<ConsultationDto> getAllConsultation(int pageNo) {
+        Pageable page = Pageable.ofSize(pageNo);
+        List<Consultation> list = consultationRepo.findAll(page).stream().toList();
+        return list.stream()
                 .map(consults -> {
                     ConsultationDto consultationDto = objectMapper.convertValue(consults, ConsultationDto.class);
                     return consultationDto;
@@ -39,28 +47,48 @@ public class ConsultationService {
     }
 
     public Consultation createConsultations(ConsultationDto consultationDto) {
-        Optional<Client> optionalClient= clientRepo.findById(consultationDto.getClientId());
+        Optional<Client> optionalClient = clientRepo.findById(consultationDto.getClientId());
+        Consultation consultations = new Consultation();
         if (optionalClient.isPresent()) {
             try {
-                Client existingClient = optionalClient.get();
-                Consultation consultation = objectMapper.convertValue(consultationDto, Consultation.class);
-                consultation.setClient(existingClient);
-                existingClient.getConsultation().add(consultation);
-               Client client =  clientRepo.save(existingClient);
-                return consultation;
+                Consultation newconsultation = new Consultation();
+                newconsultation.setConsultationDate(consultationDto.getConsultationDate());
+                newconsultation.setNextConsultationDate(consultationDto.getNextConsultationDate());
+                newconsultation.setNotes(consultationDto.getNotes());
+                newconsultation.setPrice(consultationDto.getPrice());
+                newconsultation.setAmountPaid(consultationDto.getAmountPaid());
+                newconsultation.setBalanceAmount(consultationDto.getBalanceAmount());
+                newconsultation.setClient(optionalClient.get());
+                if (optionalClient.get().getConsultation().isEmpty()) {
+                    optionalClient.get().setConsultation(new ArrayList<>());
+                    optionalClient.get().getConsultation().add(newconsultation);
+                } else {
+                    optionalClient.get().getConsultation().add(newconsultation);
+                }
+                clientRepo.save(optionalClient.get());
+                consultations = newconsultation;
 
+                //consultationRepo.save(newconsultation);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         } else {
             throw new ClientNotFoundException("Client Not Found");
         }
-        return null;
+        return consultations;
     }
 
     public void deleteConsultation(Long id) {
         consultationRepo.deleteById(id);
     }
+
+    public List<Consultation> getUpcomingConsultations(LocalDate startDate, LocalDate endDate) {
+        System.out.println(startDate+ " "+endDate);
+//        List<Consultation> upcomingConsultations =
+        return consultationRepo.findConsultationsWithinDateRange(startDate, endDate);
+
+    }
+
 
     /*public Consultation updateConsultations(ConsultationDto consultationDto) {
 
