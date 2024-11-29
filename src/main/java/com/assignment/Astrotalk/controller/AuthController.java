@@ -5,6 +5,7 @@ import com.assignment.Astrotalk.jwt.JwtService;
 import com.assignment.Astrotalk.service.AuthService;
 import com.assignment.Astrotalk.service.RefreshTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,12 +31,12 @@ public class AuthController {
     private RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponseDto<HomeScreenDto>> AuthenticateAndGetToken(@RequestBody AuthRequestDto authRequestDTO) {
+    public ResponseEntity<ApiResponseDto<HomeScreenDto>> AuthenticateAndGetToken(@RequestBody @Valid AuthRequestDto authRequestDTO) {
         return authService.loginAndHomePage(authRequestDTO);
     }
 
     @PostMapping("/refreshToken")
-    public NewAccessTokenResponseDto refreshToken(@RequestBody RefreshTokenRequestDto refreshToken){
+    public NewAccessTokenResponseDto refreshToken(@RequestBody @Valid RefreshTokenRequestDto refreshToken){
         return objectMapper.convertValue(refreshTokenService.generateNewToken(refreshToken), NewAccessTokenResponseDto.class);
     }
 }

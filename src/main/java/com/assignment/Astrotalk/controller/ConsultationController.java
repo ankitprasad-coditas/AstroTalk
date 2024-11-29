@@ -2,7 +2,6 @@ package com.assignment.Astrotalk.controller;
 
 import com.assignment.Astrotalk.dto.ApiResponseDto;
 import com.assignment.Astrotalk.dto.ConsultationDto;
-import com.assignment.Astrotalk.entity.Consultation;
 import com.assignment.Astrotalk.service.ConsultationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ public class ConsultationController {
 
     @GetMapping("/allConsultations/pageNo")
     public ResponseEntity<ApiResponseDto<List<ConsultationDto>>> getAllConsults(@RequestParam("pageNo") int pageNo) {
-
         List<ConsultationDto> allConsultation = consultationService.getAllConsultation(pageNo);
         ApiResponseDto<List<ConsultationDto>> response = new ApiResponseDto<>(allConsultation, HttpStatus.OK.value(), "All Consultations");
         return new ResponseEntity<>(response,HttpStatus.OK);
