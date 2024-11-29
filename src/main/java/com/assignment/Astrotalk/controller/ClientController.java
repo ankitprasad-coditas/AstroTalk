@@ -33,8 +33,7 @@ public class ClientController {
         ClientDto clientDto = objectMapper.readValue(clientData, ClientDto.class);
         byte[] bytes = file.getBytes();
         clientDto.setChart(bytes);
-        Client newClient = clientService.createNewClient(clientDto);
-        ClientDto createdClient = objectMapper.convertValue(newClient, ClientDto.class);
+        ClientDto createdClient = clientService.createNewClient(clientDto);
         ApiResponseDto<ClientDto> response = new ApiResponseDto<>(createdClient, HttpStatus.CREATED.value(), "Client registered successfully");
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

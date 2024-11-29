@@ -26,12 +26,12 @@ public class ClientService {
     }
 
     // Creating New Client
-    public Client createNewClient(ClientDto clientDto) {
-        Client client = objectMapper.convertValue(clientDto, Client.class);
-        if (clientRepo.findByNameAndDobAndPlaceOfBirthAndTimeOfBirth(clientDto.getName(), clientDto.getDob(), clientDto.getPlaceOfBirth(), clientDto.getTimeOfBirth()).isPresent()) {
+    public ClientDto createNewClient(ClientDto clientDto) {
+        if (clientRepo.existsByNameAndDobAndPlaceOfBirthAndTimeOfBirth(clientDto.getName(), clientDto.getDob(), clientDto.getPlaceOfBirth(), clientDto.getTimeOfBirth())) {
             throw new NotAllowedException("Client Already Exists");
         }
-        return clientRepo.save(client);
+        Client newClient = clientRepo.save(objectMapper.convertValue(clientDto, Client.class));
+        return objectMapper.convertValue(newClient,ClientDto.class);
     }
 
     //Getting ALl Clients

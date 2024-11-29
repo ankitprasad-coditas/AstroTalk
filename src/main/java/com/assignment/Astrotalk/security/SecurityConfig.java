@@ -2,11 +2,11 @@ package com.assignment.Astrotalk.security;
 
 import com.assignment.Astrotalk.authentication.CustomUserDetailsService;
 import com.assignment.Astrotalk.jwt.JwtAuthFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,28 +20,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private CustomCorsConfiguration configuration;
+
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
-    private final CustomCorsConfiguration configuration;
 
     @Autowired
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomUserDetailsService userDetailsService, CustomCorsConfiguration configuration) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomUserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
-        this.configuration = configuration;
     }
 
-//    private static final String[] SWAGGER_WHITELIST = {
-//            "/swagger-ui/**",
-//            "/v3/api-docs/**",
-//            "/swagger-resources/**",
-//            "/swagger-resources"
-//    };
+    private static final String[] WHITE_LIST_URL = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-resources"
+    };
 
-    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/**", "/v2/api-docs",
+    /*private static final String[] WHITE_LIST_URL = {"/api/v1/auth/**", "/v2/api-docs",
             "/v3/api-docs", "/v3/api-docs/**", "/swagger-resources", "/swagger-resources/**", "/configuration/ui",
             "/configuration/security", "/swagger-ui/**", "/webjars/**", "/swagger-ui.html","/api/v1/**"};
-    ;
+    ;*/
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -55,6 +56,7 @@ public class SecurityConfig {
                                 .requestMatchers(WHITE_LIST_URL).permitAll()
                                 .anyRequest().authenticated()
                 )
+                .httpBasic(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(configuration))
                 .sessionManagement(sessionManagement->sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

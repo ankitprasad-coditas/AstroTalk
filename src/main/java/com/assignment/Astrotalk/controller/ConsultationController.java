@@ -36,16 +36,18 @@ public class ConsultationController {
     }
 
     @GetMapping("/getUpcomingConsultations")
-    public ResponseEntity<List<Consultation>> getUpcomingConsultation(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate){
-        return new ResponseEntity<>(consultationService.getUpcomingConsultations(Date.valueOf(startDate).toLocalDate(),Date.valueOf(endDate).toLocalDate()),HttpStatus.OK);
+    public ResponseEntity<ApiResponseDto<List<ConsultationDto>>> getUpcomingConsultation(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate){
+        List<ConsultationDto> consultationDtoList = consultationService.getUpcomingConsultations(Date.valueOf(startDate).toLocalDate(),Date.valueOf(endDate).toLocalDate());
+        ApiResponseDto<List<ConsultationDto>> response = new ApiResponseDto<>(consultationDtoList, HttpStatus.OK.value(), "All Upcoming Consultations");
+        return new ResponseEntity<>(response,HttpStatus.OK);
 
     }
 
     @PostMapping("/newConsultation")
     public ResponseEntity<ApiResponseDto<ConsultationDto>> newConsultation(@RequestBody ConsultationDto consultationDto){
-        Consultation newConsult = consultationService.createConsultations(consultationDto);
+        ConsultationDto newConsult = consultationService.createConsultations(consultationDto);
         if(newConsult!=null){
-            ApiResponseDto<ConsultationDto> response = new ApiResponseDto<>((objectMapper.convertValue(newConsult,ConsultationDto.class)),HttpStatus.CREATED.value(),"Consultation Data Saved");
+            ApiResponseDto<ConsultationDto> response = new ApiResponseDto<>(newConsult,HttpStatus.CREATED.value(),"Consultation Data Saved");
             return new ResponseEntity<>(response,HttpStatus.CREATED);
         }
         else{

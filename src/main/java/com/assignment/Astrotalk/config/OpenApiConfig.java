@@ -1,3 +1,4 @@
+/*
 package com.assignment.Astrotalk.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
@@ -18,4 +19,4 @@ public class OpenApiConfig {
                         .description("API documentation for Java 21 Spring Boot application")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")));
     }
-}
+}*/

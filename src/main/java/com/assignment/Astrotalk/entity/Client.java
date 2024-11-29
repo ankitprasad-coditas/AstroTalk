@@ -1,10 +1,12 @@
 package com.assignment.Astrotalk.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
@@ -31,13 +33,13 @@ public class Client {
 
     private String placeOfBirth;
 
-    private Double balanceAmount  = 0d;
+    private Double balanceAmount = 0d;
 
     @Lob
     private byte[] chart;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Consultation> consultation;
 }
 

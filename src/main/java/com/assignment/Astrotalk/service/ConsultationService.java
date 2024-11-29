@@ -7,6 +7,7 @@ import com.assignment.Astrotalk.exception.ClientNotFoundException;
 import com.assignment.Astrotalk.repository.ClientRepo;
 import com.assignment.Astrotalk.repository.ConsultationRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,8 @@ public class ConsultationService {
                 .collect(Collectors.toList());
     }
 
-    public Consultation createConsultations(ConsultationDto consultationDto) {
+    @Transactional
+    public ConsultationDto createConsultations(ConsultationDto consultationDto) {
         Optional<Client> optionalClient = clientRepo.findById(consultationDto.getClientId());
         Consultation consultations = new Consultation();
         if (optionalClient.isPresent()) {
@@ -75,18 +77,24 @@ public class ConsultationService {
         } else {
             throw new ClientNotFoundException("Client Not Found");
         }
-        return consultations;
+        ConsultationDto newConsultation = objectMapper.convertValue(consultations,ConsultationDto.class);
+        newConsultation.setClientId(optionalClient.get().getId());
+        return newConsultation;
     }
 
     public void deleteConsultation(Long id) {
         consultationRepo.deleteById(id);
     }
 
-    public List<Consultation> getUpcomingConsultations(LocalDate startDate, LocalDate endDate) {
-        System.out.println(startDate+ " "+endDate);
-//        List<Consultation> upcomingConsultations =
-        return consultationRepo.findConsultationsWithinDateRange(startDate, endDate);
-
+    public List<ConsultationDto> getUpcomingConsultations(LocalDate startDate, LocalDate endDate) {
+//        System.out.println(startDate+ " "+endDate);
+        List<Consultation> upcomingConsultationList = consultationRepo.findConsultationsWithinDateRange(startDate, endDate);
+        return upcomingConsultationList.stream().map(
+                consultation -> {
+                    ConsultationDto consultationDto = objectMapper.convertValue(consultation,ConsultationDto.class);
+                    consultationDto.setClientId(consultation.getClient().getId());
+                    return consultationDto;
+                }).collect(Collectors.toList());
     }
 
 

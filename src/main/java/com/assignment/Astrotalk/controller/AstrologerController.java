@@ -3,6 +3,7 @@ package com.assignment.Astrotalk.controller;
 import com.assignment.Astrotalk.dto.ApiResponseDto;
 import com.assignment.Astrotalk.dto.AstrologerDto;
 import com.assignment.Astrotalk.service.AstrologerService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class AstrologerController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponseDto<AstrologerDto>> registerAstrologer(@RequestBody AstrologerDto astrologerDto) {
+    public ResponseEntity<ApiResponseDto<AstrologerDto>> registerAstrologer(@RequestBody @Valid AstrologerDto astrologerDto) {
 
         AstrologerDto createdAstrologer = astrologerService.createNewAstrologer(astrologerDto);
         ApiResponseDto<AstrologerDto> response = new ApiResponseDto<>(createdAstrologer, HttpStatus.CREATED.value(), "Astrologer registered successfully");

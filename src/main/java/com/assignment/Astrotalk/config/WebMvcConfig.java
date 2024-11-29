@@ -1,3 +1,4 @@
+/*
 package com.assignment.Astrotalk.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +11,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Swagger UI resources
-        registry.addResourceHandler("swagger-ui.html")
+        registry.addResourceHandler("swagger-ui/index.html")
                 .addResourceLocations("classpath:/META-INF/resources/");
 
         // Swagger static resources
@@ -18,3 +19,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 }
+*/
