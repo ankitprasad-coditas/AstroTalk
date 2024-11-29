@@ -2,7 +2,6 @@ package com.assignment.Astrotalk.controller;
 
 import com.assignment.Astrotalk.dto.ApiResponseDto;
 import com.assignment.Astrotalk.dto.ClientDto;
-import com.assignment.Astrotalk.entity.Client;
 import com.assignment.Astrotalk.service.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +46,8 @@ public class ClientController {
 
     @GetMapping("/clientById/{id}")
     public ResponseEntity<ApiResponseDto<ClientDto>> clientById(@PathVariable Long id) {
-        ClientDto theCline = objectMapper.convertValue(clientService.getClientById(id), ClientDto.class);
-        ApiResponseDto<ClientDto> response = new ApiResponseDto<>(theCline,HttpStatus.OK.value(),"Successfully Fetched Client Data");
+        ClientDto theClient = objectMapper.convertValue(clientService.getClientById(id), ClientDto.class);
+        ApiResponseDto<ClientDto> response = new ApiResponseDto<>(theClient,HttpStatus.OK.value(),"Successfully Fetched Client Data");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

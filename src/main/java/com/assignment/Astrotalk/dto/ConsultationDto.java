@@ -1,5 +1,6 @@
 package com.assignment.Astrotalk.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -7,12 +8,20 @@ import java.time.LocalDate;
 @Data
 public class ConsultationDto {
     private Long id;
+
+    @NotBlank(message = "Need A Consultation Date")
     private LocalDate consultationDate;
+
     private LocalDate nextConsultationDate;
+
     private String notes;
+
     private double price;
+
     private double amountPaid;
-    private Double balanceAmount = 0d;
+
+    private double balanceAmount = 0d;
+
     private Long clientId;
 
     public ConsultationDto(Long id, LocalDate consultationDate, LocalDate nextConsultationDate, String notes, double price, double amountPaid, Double balanceAmount, Long clientId) {

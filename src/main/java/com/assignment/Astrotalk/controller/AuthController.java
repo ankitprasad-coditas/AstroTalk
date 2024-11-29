@@ -1,10 +1,9 @@
 package com.assignment.Astrotalk.controller;
 
-import com.assignment.Astrotalk.dto.ApiResponseDto;
-import com.assignment.Astrotalk.dto.AuthRequestDto;
-import com.assignment.Astrotalk.dto.HomeScreenDto;
+import com.assignment.Astrotalk.dto.*;
 import com.assignment.Astrotalk.jwt.JwtService;
 import com.assignment.Astrotalk.service.AuthService;
+import com.assignment.Astrotalk.service.RefreshTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +26,17 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+
     @PostMapping("/login")
     public ResponseEntity<ApiResponseDto<HomeScreenDto>> AuthenticateAndGetToken(@RequestBody AuthRequestDto authRequestDTO) {
         return authService.loginAndHomePage(authRequestDTO);
     }
-//
-//    @PostMapping("/refreshToken")
-//    public NewAccessTokenResponseDto refreshToken(@RequestBody RefreshTokenRequestDto refreshToken){
-//        return objectMapper.convertValue(refreshTokenService.generateNewToken(refreshToken), NewAccessTokenResponseDto.class);
-//    }
+
+    @PostMapping("/refreshToken")
+    public NewAccessTokenResponseDto refreshToken(@RequestBody RefreshTokenRequestDto refreshToken){
+        return objectMapper.convertValue(refreshTokenService.generateNewToken(refreshToken), NewAccessTokenResponseDto.class);
+    }
 }
 

@@ -1,6 +1,9 @@
 package com.assignment.Astrotalk.service;
 
-import com.assignment.Astrotalk.dto.*;
+import com.assignment.Astrotalk.dto.ApiResponseDto;
+import com.assignment.Astrotalk.dto.AuthRequestDto;
+import com.assignment.Astrotalk.dto.HomeScreenDto;
+import com.assignment.Astrotalk.dto.JwtResponseDto;
 import com.assignment.Astrotalk.exception.NotAllowedException;
 import com.assignment.Astrotalk.jwt.JwtService;
 import com.assignment.Astrotalk.repository.ClientRepo;
@@ -13,9 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
-import java.time.Instant;
+
 import java.time.LocalDate;
-import java.util.Date;
 
 @Service
 public class AuthService {
@@ -41,7 +43,7 @@ public class AuthService {
     private ClientRepo clientRepo;
 
 
-    public ResponseEntity<ApiResponseDto<HomeScreenDto>> loginAndHomePage(AuthRequestDto authRequestDTO){
+    public ResponseEntity<ApiResponseDto<HomeScreenDto>> loginAndHomePage(AuthRequestDto authRequestDTO) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         if (authentication.isAuthenticated()) {
             HomeScreenDto homeScreenDto = new HomeScreenDto();
@@ -56,7 +58,7 @@ public class AuthService {
             homeScreenDto.setJwtResponseDto(jwtResponseDto);
             homeScreenDto.setClientDtoList(clientService.allClients());
 
-            Double monthlyEarning = clientRepo.findTotalEarningsByMonth(LocalDate.now().getMonth().getValue(),LocalDate.now().getYear());
+            Double monthlyEarning = clientRepo.findTotalEarningsByMonth(LocalDate.now().getMonth().getValue(), LocalDate.now().getYear());
             homeScreenDto.setMonthlyEarning(monthlyEarning);
 
             ApiResponseDto<HomeScreenDto> response = new ApiResponseDto<>(homeScreenDto, HttpStatus.CREATED.value(), "Logged In Successfully");
@@ -64,9 +66,5 @@ public class AuthService {
         } else {
             throw new NotAllowedException("Invalid Login Details!");
         }
-    }
-
-    public NewAccessTokenResponseDto refreshToken(RefreshTokenRequestDto refreshToken){
-        return objectMapper.convertValue(refreshTokenService.generateNewToken(refreshToken), NewAccessTokenResponseDto.class);
     }
 }

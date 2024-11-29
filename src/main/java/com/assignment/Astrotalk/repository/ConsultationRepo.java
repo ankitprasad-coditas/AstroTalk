@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface ConsultationRepo extends JpaRepository<Consultation, Long> {
 
-    @Query(value = "SELECT * FROM Consultations  WHERE next_consultation_date BETWEEN ?1 AND ?2",nativeQuery = true)
+    @Query(value = "SELECT * FROM Consultations  WHERE next_consultation_date BETWEEN ?1 AND ?2", nativeQuery = true)
     List<Consultation> findConsultationsWithinDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT SUM(c.balanceAmount) FROM Consultation c WHERE c.client.id = :clientId")
+    Double findTotalBalanceAmountByClientId(@Param("clientId") Long clientId);
 }

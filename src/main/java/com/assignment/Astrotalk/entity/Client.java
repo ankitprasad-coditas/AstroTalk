@@ -33,7 +33,7 @@ public class Client {
 
     private String placeOfBirth;
 
-    private Double balanceAmount = 0d;
+    private double balanceAmount = 0d;
 
     @Lob
     private byte[] chart;

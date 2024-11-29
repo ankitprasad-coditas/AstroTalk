@@ -26,7 +26,7 @@ public class RefreshTokenService {
         if (astrologerRepoByEmailId.isPresent()) {
 
             String tokenName = claims.get("tokenName").toString();
-            if (tokenName.equalsIgnoreCase("accessToken")) {
+            if (!tokenName.equalsIgnoreCase("refreshToken")) {
                 return "Incorrect Token Passed";
             }
 
@@ -34,8 +34,9 @@ public class RefreshTokenService {
             if (date.before(new Date())) {
                 return "Session Expired..Please ReLogin";
             }
-            return jwtService.generateAccessToken((String) claims.get("username"));
+            String newToken = jwtService.generateAccessToken((String) claims.get("sub"));
+            return newToken;
         }
-        return "Session Expired..Please ReLogin";
+        return "Token Expired..Please ReLogin";
     }
 }
