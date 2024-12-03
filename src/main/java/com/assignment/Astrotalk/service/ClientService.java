@@ -7,6 +7,7 @@ import com.assignment.Astrotalk.exception.NotAllowedException;
 import com.assignment.Astrotalk.repository.ClientRepo;
 import com.assignment.Astrotalk.repository.ConsultationRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +53,21 @@ public class ClientService {
     public Client getClientById(Long id) {
         Client theClient = clientRepo.findById(id).orElseThrow(() -> new ClientNotFoundException("Client Doesn't Exists"));
         Double totalBalance = getTotalBalanceAmount(id);
+        if (totalBalance == null) {
+            totalBalance = 0d;
+        }
         theClient.setBalanceAmount(totalBalance);
         return theClient;
+    }
+
+    // Getting Clients By Name
+    @Transactional
+    public List<ClientDto> searchByName(String name) {
+        List<Client> clientList = clientRepo.findByName(name);
+        List<ClientDto> clientDtos = clientList.stream()
+                .map(client -> objectMapper.convertValue(client, ClientDto.class))
+                .collect(Collectors.toList());
+        return clientDtos;
     }
 
     // Updating a Client

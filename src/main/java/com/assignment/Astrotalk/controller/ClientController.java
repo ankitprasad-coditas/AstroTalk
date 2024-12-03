@@ -4,6 +4,10 @@ import com.assignment.Astrotalk.dto.ApiResponseDto;
 import com.assignment.Astrotalk.dto.ClientDto;
 import com.assignment.Astrotalk.service.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +33,13 @@ public class ClientController {
         this.objectMapper = objectMapper;
     }
 
+    @Operation(summary = "Create New Client ", description = "Returns The Clients Created")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully Created", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource", content = @Content)
+    })
     @PostMapping("/newClient")
     public ResponseEntity<ApiResponseDto<ClientDto>> newClient(@RequestParam("data") String clientData, @RequestParam("image") MultipartFile file) throws IOException {
         ClientDto clientDto = objectMapper.readValue(clientData, ClientDto.class);
@@ -39,10 +50,17 @@ public class ClientController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "View All Client ", description = "Returns All The Clients")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully Fetched", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource", content = @Content)
+    })
     @GetMapping("/allClients")
-    public ResponseEntity<ApiResponseDto<List<ClientDto>>> allClients( @RequestParam(value = "sorting",required = false) boolean isSort) {
+    public ResponseEntity<ApiResponseDto<List<ClientDto>>> allClients(@RequestParam(value = "sorting", required = false) boolean isSort) {
         List<ClientDto> allClients = clientService.allClients();
-        if(isSort){
+        if (isSort) {
             Collections.sort(allClients, new Comparator<ClientDto>() {
                 @Override
                 public int compare(ClientDto o1, ClientDto o2) {
@@ -50,21 +68,62 @@ public class ClientController {
                 }
             });
         }
-        ApiResponseDto<List<ClientDto>> response = new ApiResponseDto<>(allClients, HttpStatus.CREATED.value(), "All Clients");
+        ApiResponseDto<List<ClientDto>> response = new ApiResponseDto<>(allClients, HttpStatus.OK.value(), "All Clients");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "View Client By Id", description = "Returns The Client")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully Fetched", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource", content = @Content)
+    })
     @GetMapping("/clientById/{id}")
     public ResponseEntity<ApiResponseDto<ClientDto>> clientById(@PathVariable Long id) {
         ClientDto theClient = objectMapper.convertValue(clientService.getClientById(id), ClientDto.class);
-        ApiResponseDto<ClientDto> response = new ApiResponseDto<>(theClient,HttpStatus.OK.value(),"Successfully Fetched Client Data");
+        ApiResponseDto<ClientDto> response = new ApiResponseDto<>(theClient, HttpStatus.OK.value(), "Successfully Fetched Client Data");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Search Client By Name", description = "Returns The Client(s)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully Fetched", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource", content = @Content)
+    })
+    @GetMapping("/searchByName/{name}")
+    public ResponseEntity<ApiResponseDto<List<ClientDto>>> searchByName(@PathVariable String name) {
+        List<ClientDto> theClients = clientService.searchByName(name);
+        ApiResponseDto<List<ClientDto>> response = new ApiResponseDto<>(theClients, HttpStatus.OK.value(), "Clients Fetched Successfully");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Delete Client by Ids", description = "Removes the Client")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully Deleted", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource", content = @Content)
+    })
     @DeleteMapping("/deleteClient/{id}")
-    public ResponseEntity<ApiResponseDto<String>> removeClient(@PathVariable  Long id) {
+    public ResponseEntity<ApiResponseDto<String>> removeClient(@PathVariable Long id) {
         clientService.deleteClient(id);
-        ApiResponseDto<String> response = new ApiResponseDto<>("User Not Found",HttpStatus.NOT_FOUND.value(),"Client Deleted Successfully");
+        ApiResponseDto<String> response = new ApiResponseDto<>("User Not Found", HttpStatus.NOT_FOUND.value(), "Client Deleted Successfully");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Update Client Details", description = "Returns the Updates Client Data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully Deleted", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource", content = @Content)
+    })
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ApiResponseDto<ClientDto>> updateClient(@PathVariable Long id, @RequestBody ClientDto clientDto){
+        ApiResponseDto response = new ApiResponseDto(clientService.updateClient(id,clientDto),HttpStatus.OK.value(),"Client Details Updated");
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }

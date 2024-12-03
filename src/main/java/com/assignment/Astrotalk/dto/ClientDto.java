@@ -1,6 +1,7 @@
 package com.assignment.Astrotalk.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 public class ClientDto {
     private Long id;
 
+    @NotBlank(message = "Please Provide A Name")
     private String name;
 
     @NotBlank(message = "Enter A Valid Date Of Birth")
@@ -26,5 +28,6 @@ public class ClientDto {
 
     private byte[] chart;
 
-    private Double balanceAmount;
+    @Positive(message = "Enter A Positive Number or Zero(0)")
+    private double balanceAmount = 0d;
 }

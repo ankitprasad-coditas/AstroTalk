@@ -4,6 +4,10 @@ import com.assignment.Astrotalk.dto.ApiResponseDto;
 import com.assignment.Astrotalk.dto.ConsultationDto;
 import com.assignment.Astrotalk.service.ConsultationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +30,13 @@ public class ConsultationController {
         this.objectMapper = objectMapper;
     }
 
+    @Operation(summary = "View All Consultations", description = "Returns All the Consultations of the Astrologer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully Fetched",content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed",content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised",content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource",content = @Content)
+    })
     @GetMapping("/allConsultations/pageNo")
     public ResponseEntity<ApiResponseDto<List<ConsultationDto>>> getAllConsults(@RequestParam("pageNo") int pageNo) {
         List<ConsultationDto> allConsultation = consultationService.getAllConsultation(pageNo);
@@ -33,6 +44,13 @@ public class ConsultationController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @Operation(summary = "View All Upcoming Consultations", description = "Returns All the Upcoming Consultations of the Astrologer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully Fetched",content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed",content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised",content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource",content = @Content)
+    })
     @GetMapping("/getUpcomingConsultations")
     public ResponseEntity<ApiResponseDto<List<ConsultationDto>>> getUpcomingConsultation(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate){
         List<ConsultationDto> consultationDtoList = consultationService.getUpcomingConsultations(Date.valueOf(startDate).toLocalDate(),Date.valueOf(endDate).toLocalDate());
@@ -41,6 +59,13 @@ public class ConsultationController {
 
     }
 
+    @Operation(summary = "Create New Consultation", description = "Returns the Newly Created Consultation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully Created",content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed",content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised",content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource",content = @Content)
+    })
     @PostMapping("/newConsultation")
     public ResponseEntity<ApiResponseDto<ConsultationDto>> newConsultation(@RequestBody ConsultationDto consultationDto){
         ConsultationDto newConsult = consultationService.createConsultations(consultationDto);
@@ -53,6 +78,13 @@ public class ConsultationController {
         }
     }
 
+    @Operation(summary = "Delete A Consultation", description = "Deletes The consultation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully Created",content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication Failed",content = @Content),
+            @ApiResponse(responseCode = "403", description = "Not Authorised",content = @Content),
+            @ApiResponse(responseCode = "404", description = "Missing Resource",content = @Content)
+    })
     @DeleteMapping("/deleteConsultation/{id}")
     public ResponseEntity<ApiResponseDto<String>> deleteConsultation(@PathVariable  Long id) {
         consultationService.deleteConsultation(id);
