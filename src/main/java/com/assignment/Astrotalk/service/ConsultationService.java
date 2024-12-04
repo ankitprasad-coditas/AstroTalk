@@ -49,6 +49,7 @@ public class ConsultationService {
         Optional<Client> optionalClient = clientRepo.findById(consultationDto.getClientId());
         Consultation consultations = new Consultation();
         if (optionalClient.isPresent()) {
+
             try {
                 Consultation newconsultation = new Consultation();
                 newconsultation.setConsultationDate(consultationDto.getConsultationDate());

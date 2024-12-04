@@ -35,7 +35,7 @@ public class Client {
 
     private double balanceAmount = 0d;
 
-    @Lob
+//    @Lob
     private byte[] chart;
 
     @JsonManagedReference

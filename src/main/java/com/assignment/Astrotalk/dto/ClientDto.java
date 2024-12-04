@@ -1,6 +1,7 @@
 package com.assignment.Astrotalk.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class ClientDto {
     @NotBlank(message = "Please Provide A Name")
     private String name;
 
-    @NotBlank(message = "Enter A Valid Date Of Birth")
+    @NotNull(message = "Enter A Valid Date Of Birth")
     private LocalDate dob;
 
     @NotBlank(message = "Enter A Valid Time Of Birth")

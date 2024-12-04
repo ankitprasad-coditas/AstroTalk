@@ -2,19 +2,24 @@ package com.assignment.Astrotalk.controller;
 
 import com.assignment.Astrotalk.dto.ApiResponseDto;
 import com.assignment.Astrotalk.dto.ClientDto;
+import com.assignment.Astrotalk.entity.Client;
 import com.assignment.Astrotalk.service.ClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -26,11 +31,13 @@ public class ClientController {
 
     private final ClientService clientService;
     private final ObjectMapper objectMapper;
+    private final Validator validator;
 
     @Autowired
-    public ClientController(ClientService clientService, ObjectMapper objectMapper) {
+    public ClientController(ClientService clientService, ObjectMapper objectMapper, Validator validator) {
         this.clientService = clientService;
         this.objectMapper = objectMapper;
+        this.validator = validator;
     }
 
     @Operation(summary = "Create New Client ", description = "Returns The Clients Created")
@@ -43,11 +50,16 @@ public class ClientController {
     @PostMapping("/newClient")
     public ResponseEntity<ApiResponseDto<ClientDto>> newClient(@RequestParam("data") String clientData, @RequestParam("image") MultipartFile file) throws IOException {
         ClientDto clientDto = objectMapper.readValue(clientData, ClientDto.class);
-        byte[] bytes = file.getBytes();
-        clientDto.setChart(bytes);
-        ClientDto createdClient = clientService.createNewClient(clientDto);
-        ApiResponseDto<ClientDto> response = new ApiResponseDto<>(createdClient, HttpStatus.CREATED.value(), "Client registered successfully");
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        /*if(!validator.validate(clientDto).isEmpty()) {
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }else{*/
+            byte[] bytes = file.getBytes();
+            clientDto.setChart(bytes);
+            ClientDto createdClient = clientService.createNewClient(clientDto);
+            ApiResponseDto<ClientDto> response = new ApiResponseDto<>(createdClient, HttpStatus.CREATED.value(), "Client registered successfully");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+//        }
+
     }
 
     @Operation(summary = "View All Client ", description = "Returns All The Clients")
@@ -82,6 +94,7 @@ public class ClientController {
     @GetMapping("/clientById/{id}")
     public ResponseEntity<ApiResponseDto<ClientDto>> clientById(@PathVariable Long id) {
         ClientDto theClient = objectMapper.convertValue(clientService.getClientById(id), ClientDto.class);
+        theClient.setChart(Base64.getEncoder().encode(theClient.getChart()));
         ApiResponseDto<ClientDto> response = new ApiResponseDto<>(theClient, HttpStatus.OK.value(), "Successfully Fetched Client Data");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -125,6 +138,17 @@ public class ClientController {
     public ResponseEntity<ApiResponseDto<ClientDto>> updateClient(@PathVariable Long id, @RequestBody ClientDto clientDto){
         ApiResponseDto response = new ApiResponseDto(clientService.updateClient(id,clientDto),HttpStatus.OK.value(),"Client Details Updated");
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @GetMapping("/image/{id}")
+    public ResponseEntity<byte[]> getClientImage(@PathVariable Long id) {
+        Client clientOptional = clientService.getClientById(id);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + clientOptional.getName() + "-image.png\"")
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(clientOptional.getChart());
+
     }
 }
 

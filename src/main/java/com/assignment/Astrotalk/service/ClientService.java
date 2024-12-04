@@ -82,11 +82,11 @@ public class ClientService {
             theClient.setDob(clientDto.getDob());
         }
 
-        if (clientDto.getTimeOfBirth() != null || !clientDto.getPlaceOfBirth().isBlank()) {
+        if (clientDto.getTimeOfBirth() != null) {
             theClient.setTimeOfBirth(clientDto.getTimeOfBirth());
         }
 
-        if (clientDto.getPlaceOfBirth() != null || !clientDto.getPlaceOfBirth().isBlank()) {
+        if (clientDto.getPlaceOfBirth() != null) {
             theClient.setPlaceOfBirth(clientDto.getPlaceOfBirth());
         }
 
