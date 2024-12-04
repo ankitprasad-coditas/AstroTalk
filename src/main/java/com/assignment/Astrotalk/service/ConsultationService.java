@@ -4,6 +4,7 @@ import com.assignment.Astrotalk.dto.ConsultationDto;
 import com.assignment.Astrotalk.entity.Client;
 import com.assignment.Astrotalk.entity.Consultation;
 import com.assignment.Astrotalk.exception.ClientNotFoundException;
+import com.assignment.Astrotalk.exception.NotAllowedException;
 import com.assignment.Astrotalk.repository.ClientRepo;
 import com.assignment.Astrotalk.repository.ConsultationRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +51,10 @@ public class ConsultationService {
         Optional<Client> optionalClient = clientRepo.findById(consultationDto.getClientId());
         Consultation consultations = new Consultation();
         if (optionalClient.isPresent()) {
-
-            try {
                 Consultation newconsultation = new Consultation();
+                if(consultationDto.getConsultationDate().isBefore(LocalDate.now())){
+                    throw new NotAllowedException("Cannot create backdated consultations");
+                }
                 newconsultation.setConsultationDate(consultationDto.getConsultationDate());
                 newconsultation.setNextConsultationDate(consultationDto.getNextConsultationDate());
                 newconsultation.setNotes(consultationDto.getNotes());
@@ -67,11 +70,6 @@ public class ConsultationService {
                 }
                 clientRepo.save(optionalClient.get());
                 consultations = newconsultation;
-
-                //consultationRepo.save(newconsultation);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
         } else {
             throw new ClientNotFoundException("Client Not Found");
         }
