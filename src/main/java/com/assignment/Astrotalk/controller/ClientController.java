@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,10 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @CrossOrigin
@@ -48,18 +47,23 @@ public class ClientController {
             @ApiResponse(responseCode = "404", description = "Missing Resource", content = @Content)
     })
     @PostMapping("/newClient")
-    public ResponseEntity<ApiResponseDto<ClientDto>> newClient(@RequestParam("data") String clientData, @RequestParam("image") MultipartFile file) throws IOException {
+    public ResponseEntity<ApiResponseDto<?>> newClient(@RequestParam("data") String clientData, @RequestParam("image") MultipartFile file) throws IOException {
         ClientDto clientDto = objectMapper.readValue(clientData, ClientDto.class);
-        /*if(!validator.validate(clientDto).isEmpty()) {
-            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
-        }else{*/
+        Set<ConstraintViolation<ClientDto>> variable = validator.validate(clientDto);
+        if(!variable.isEmpty()) {
+            StringBuilder violations =  new StringBuilder();
+            for(ConstraintViolation<ClientDto> violation : variable){
+                violations.append(violation.getMessage()).append(", ");
+            }
+            ApiResponseDto<?> response = new ApiResponseDto<>(HttpStatus.BAD_REQUEST.value(),violations.toString());
+            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+        }else{
             byte[] bytes = file.getBytes();
             clientDto.setChart(bytes);
             ClientDto createdClient = clientService.createNewClient(clientDto);
             ApiResponseDto<ClientDto> response = new ApiResponseDto<>(createdClient, HttpStatus.CREATED.value(), "Client registered successfully");
             return new ResponseEntity<>(response, HttpStatus.CREATED);
-//        }
-
+        }
     }
 
     @Operation(summary = "View All Client ", description = "Returns All The Clients")

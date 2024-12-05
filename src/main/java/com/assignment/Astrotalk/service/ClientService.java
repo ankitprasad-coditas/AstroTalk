@@ -34,6 +34,7 @@ public class ClientService {
         if (clientRepo.existsByNameAndDobAndPlaceOfBirthAndTimeOfBirth(clientDto.getName(), clientDto.getDob(), clientDto.getPlaceOfBirth(), clientDto.getTimeOfBirth())) {
             throw new NotAllowedException("Client Already Exists");
         }
+
         Client newClient = clientRepo.save(objectMapper.convertValue(clientDto, Client.class));
         return objectMapper.convertValue(newClient, ClientDto.class);
     }
